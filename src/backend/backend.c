@@ -89,7 +89,6 @@ void paint_all_new(session_t *ps, struct managed_win *t, bool ignore_damage) {
 
 	if (ps->backend_data->ops->device_status &&
 	    ps->backend_data->ops->device_status(ps->backend_data) != DEVICE_STATUS_NORMAL) {
-		printf("oof\n");
 		return handle_device_reset(ps);
 	}
 	if (ps->o.xrender_sync_fence) {

@@ -1542,9 +1542,6 @@ static void draw_callback_impl(EV_P_ session_t *ps, int revents attr_unused) {
 		if (ps->o.benchmark && paint >= ps->o.benchmark) {
 			exit(0);
 		}
-	}else
-	{
-		printf("not rendering >:(\n");
 	}
 
 	if (!fade_running) {
