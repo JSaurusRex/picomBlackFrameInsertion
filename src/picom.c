@@ -1460,6 +1460,7 @@ static void handle_pending_updates(EV_P_ struct session *ps) {
 }
 
 static void draw_callback_impl(EV_P_ session_t *ps, int revents attr_unused) {
+	
 	handle_pending_updates(EV_A_ ps);
 
 	if (ps->first_frame) {
@@ -1489,6 +1490,8 @@ static void draw_callback_impl(EV_P_ session_t *ps, int revents attr_unused) {
 		}
 	}
 
+
+
 	/* TODO(yshui) Have a stripped down version of paint_preprocess that is used when
 	 * screen is not redirected. its sole purpose should be to decide whether the
 	 * screen should be redirected. */
@@ -1497,6 +1500,8 @@ static void draw_callback_impl(EV_P_ session_t *ps, int revents attr_unused) {
 	bool was_redirected = ps->redirected;
 	auto bottom = paint_preprocess(ps, &fade_running, &animation);
 	ps->tmout_unredir_hit = false;
+
+
 
 	if (!was_redirected && ps->redirected) {
 		// paint_preprocess redirected the screen, which might change the state of
@@ -1507,6 +1512,7 @@ static void draw_callback_impl(EV_P_ session_t *ps, int revents attr_unused) {
 		// TODO(yshui) This is not ideal, we should try to avoid setting window
 		// flags in paint_preprocess.
 		log_debug("Re-run _draw_callback");
+		// printf("eyyy redirecting\n");
 		return draw_callback_impl(EV_A_ ps, revents);
 	}
 
@@ -1527,6 +1533,7 @@ static void draw_callback_impl(EV_P_ session_t *ps, int revents attr_unused) {
 			paint_all_new(ps, bottom, false);
 		} else {
 			paint_all(ps, bottom, false);
+			// printf("hihi :)\n");
 		}
 		log_trace("Render end");
 
@@ -1535,6 +1542,9 @@ static void draw_callback_impl(EV_P_ session_t *ps, int revents attr_unused) {
 		if (ps->o.benchmark && paint >= ps->o.benchmark) {
 			exit(0);
 		}
+	}else
+	{
+		printf("not rendering >:(\n");
 	}
 
 	if (!fade_running) {
@@ -1554,9 +1564,10 @@ static void draw_callback(EV_P_ ev_idle *w, int revents) {
 
 	// Don't do painting non-stop unless we are in benchmark mode, or if
 	// draw_callback_impl thinks we should continue painting.
-	if (!ps->o.benchmark && !ps->redraw_needed) {
-		ev_idle_stop(EV_A_ & ps->draw_idle);
-	}
+	ps->redraw_needed = true;
+	// if (!ps->o.benchmark && !ps->redraw_needed) {
+	// 	ev_idle_stop(EV_A_ & ps->draw_idle);
+	// }
 }
 
 static void x_event_callback(EV_P attr_unused, ev_io *w, int revents attr_unused) {
@@ -2582,6 +2593,7 @@ int main(int argc, char **argv) {
 			// We only do this once
 			need_fork = false;
 		}
+		printf("session run\n");
 		session_run(ps_g);
 		quit = ps_g->quit;
 		if (quit && ps_g->o.write_pid_path) {
